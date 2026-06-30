@@ -1,0 +1,207 @@
+/* ================================================================
+   ChronosFocus — Theme & Design System
+   다이나믹 테마: 시간대에 따른 배경색 자동 변화
+================================================================ */
+
+/* ── Google Font Fallback ── */
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+
+/* ════════════════ CSS Custom Properties ════════════════ */
+:root {
+  --font-main: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-display: 'Space Grotesk', var(--font-main);
+
+  /* Radius */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-full: 9999px;
+
+  /* Transitions */
+  --t-fast: 150ms ease;
+  --t-base: 280ms cubic-bezier(.4,0,.2,1);
+  --t-slow: 500ms cubic-bezier(.4,0,.2,1);
+  --t-theme: 1200ms cubic-bezier(.4,0,.2,1);
+
+  /* Z-layers */
+  --z-page: 1;
+  --z-nav: 100;
+  --z-popup: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-splash: 500;
+}
+
+/* ════════════════ TIME-BASED THEMES ════════════════ */
+
+/* 새벽 (0~5시) */
+[data-time-theme="dawn"] {
+  --bg-gradient-start: #0d0d1a;
+  --bg-gradient-end:   #1a1030;
+  --bg-surface:        rgba(20,15,40,0.85);
+  --bg-card:           rgba(30,22,58,0.9);
+  --bg-input:          rgba(40,30,70,0.8);
+  --accent-primary:    #7c6af5;
+  --accent-secondary:  #a78bfa;
+  --accent-glow:       rgba(124,106,245,0.35);
+  --text-primary:      #e2dcff;
+  --text-secondary:    #9d93c8;
+  --text-muted:        #6a6090;
+  --border-color:      rgba(124,106,245,0.18);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.6);
+  --slot-label:        "🌙 새벽";
+  --sky-emoji:         "🌙";
+}
+
+/* 아침 (5~9시) */
+[data-time-theme="morning"] {
+  --bg-gradient-start: #1a0a2e;
+  --bg-gradient-end:   #ff7043;
+  --bg-surface:        rgba(30,15,50,0.85);
+  --bg-card:           rgba(255,112,67,0.08);
+  --bg-input:          rgba(255,140,100,0.1);
+  --accent-primary:    #ff7043;
+  --accent-secondary:  #ffab40;
+  --accent-glow:       rgba(255,112,67,0.3);
+  --text-primary:      #fff3e0;
+  --text-secondary:    #ffb74d;
+  --text-muted:        #9e7e5a;
+  --border-color:      rgba(255,112,67,0.2);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* 오전 (9~12시) — Peak Focus */
+[data-time-theme="forenoon"] {
+  --bg-gradient-start: #0f1929;
+  --bg-gradient-end:   #162a4a;
+  --bg-surface:        rgba(12,22,40,0.9);
+  --bg-card:           rgba(20,35,65,0.9);
+  --bg-input:          rgba(30,50,90,0.7);
+  --accent-primary:    #38bdf8;
+  --accent-secondary:  #60efff;
+  --accent-glow:       rgba(56,189,248,0.3);
+  --text-primary:      #e0f4ff;
+  --text-secondary:    #7dc8e8;
+  --text-muted:        #4a7a98;
+  --border-color:      rgba(56,189,248,0.2);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* 점심 (12~14시) */
+[data-time-theme="lunch"] {
+  --bg-gradient-start: #0a1628;
+  --bg-gradient-end:   #1e3a2f;
+  --bg-surface:        rgba(10,22,40,0.9);
+  --bg-card:           rgba(20,55,40,0.85);
+  --bg-input:          rgba(30,70,50,0.7);
+  --accent-primary:    #34d399;
+  --accent-secondary:  #6ee7b7;
+  --accent-glow:       rgba(52,211,153,0.3);
+  --text-primary:      #d1fae5;
+  --text-secondary:    #6fcf97;
+  --text-muted:        #3d7a5c;
+  --border-color:      rgba(52,211,153,0.2);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* 오후 (14~18시) */
+[data-time-theme="afternoon"] {
+  --bg-gradient-start: #1a1200;
+  --bg-gradient-end:   #2d1f00;
+  --bg-surface:        rgba(26,18,0,0.9);
+  --bg-card:           rgba(50,35,0,0.85);
+  --bg-input:          rgba(60,45,5,0.7);
+  --accent-primary:    #fbbf24;
+  --accent-secondary:  #fde68a;
+  --accent-glow:       rgba(251,191,36,0.3);
+  --text-primary:      #fef3c7;
+  --text-secondary:    #d4a017;
+  --text-muted:        #7a5c10;
+  --border-color:      rgba(251,191,36,0.2);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* 저녁 (18~21시) */
+[data-time-theme="evening"] {
+  --bg-gradient-start: #1a0a1e;
+  --bg-gradient-end:   #2d0a3a;
+  --bg-surface:        rgba(26,10,30,0.9);
+  --bg-card:           rgba(50,15,65,0.85);
+  --bg-input:          rgba(60,20,80,0.7);
+  --accent-primary:    #e879f9;
+  --accent-secondary:  #f0abfc;
+  --accent-glow:       rgba(232,121,249,0.3);
+  --text-primary:      #fae8ff;
+  --text-secondary:    #d946ef;
+  --text-muted:        #8a4a95;
+  --border-color:      rgba(232,121,249,0.2);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* 밤 (21~24시) */
+[data-time-theme="night"] {
+  --bg-gradient-start: #080c14;
+  --bg-gradient-end:   #0f1520;
+  --bg-surface:        rgba(8,12,20,0.95);
+  --bg-card:           rgba(15,20,35,0.9);
+  --bg-input:          rgba(20,28,48,0.8);
+  --accent-primary:    #6366f1;
+  --accent-secondary:  #818cf8;
+  --accent-glow:       rgba(99,102,241,0.3);
+  --text-primary:      #e0e7ff;
+  --text-secondary:    #818cf8;
+  --text-muted:        #475569;
+  --border-color:      rgba(99,102,241,0.18);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.7);
+}
+
+/* ════════════════ BASE RESET ════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body.app-body {
+  font-family: var(--font-main);
+  background: linear-gradient(160deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-primary);
+  min-height: 100dvh;
+  overflow: hidden;
+  transition: background var(--t-theme), color var(--t-theme);
+  position: relative;
+}
+
+/* Animated background stars */
+body.app-body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 15%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 80%, rgba(255,255,255,0.08) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--t-theme);
+}
+
+/* ════════════════ SCROLLBAR ════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+/* ════════════════ SELECTION ════════════════ */
+::selection { background: var(--accent-glow); color: var(--text-primary); }
+
+/* ════════════════ FOCUS VISIBLE ════════════════ */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}

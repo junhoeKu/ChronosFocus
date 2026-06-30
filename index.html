@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChronosFocus — 생체 리듬 기반 생산성 앱</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/onboarding.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/tasks.css" />
+</head>
+<body class="app-body" data-theme="auto">
+
+  <!-- ───────────────────────── SPLASH ───────────────────────── -->
+  <div id="splash-screen" class="splash">
+    <div class="splash-inner">
+      <div class="splash-logo">
+        <div class="logo-ring">
+          <svg viewBox="0 0 80 80" class="logo-svg">
+            <circle cx="40" cy="40" r="36" class="logo-circle-track"/>
+            <circle cx="40" cy="40" r="36" class="logo-circle-fill" id="splash-circle"/>
+            <text x="40" y="47" text-anchor="middle" class="logo-icon-text">⏱</text>
+          </svg>
+        </div>
+        <h1 class="splash-title">ChronosFocus</h1>
+        <p class="splash-sub">생체 리듬 기반 생산성 관리</p>
+      </div>
+      <div class="splash-loader"><div class="loader-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── APP WRAPPER ───────────────────────── -->
+  <div id="app" class="app hidden">
+
+    <!-- NAV BAR -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="nav-btn active" data-page="dashboard" aria-label="대시보드">
+        <i class="fa-solid fa-chart-line"></i><span>대시보드</span>
+      </button>
+      <button class="nav-btn" data-page="tasks" aria-label="할 일">
+        <i class="fa-solid fa-list-check"></i><span>할 일</span>
+      </button>
+      <button class="nav-btn nav-center-btn" data-page="add-task" aria-label="추가">
+        <div class="center-btn-ring"><i class="fa-solid fa-plus"></i></div>
+      </button>
+      <button class="nav-btn" data-page="checkin" aria-label="체크인">
+        <i class="fa-solid fa-heart-pulse"></i><span>체크인</span>
+      </button>
+      <button class="nav-btn" data-page="profile" aria-label="프로필">
+        <i class="fa-solid fa-user"></i><span>프로필</span>
+      </button>
+    </nav>
+
+    <!-- PAGES -->
+    <main class="pages-container" id="pages-container">
+      <div id="page-dashboard" class="page active"></div>
+      <div id="page-tasks" class="page"></div>
+      <div id="page-add-task" class="page"></div>
+      <div id="page-checkin" class="page"></div>
+      <div id="page-profile" class="page"></div>
+    </main>
+  </div>
+
+  <!-- ───────────────────────── ONBOARDING ───────────────────────── -->
+  <div id="onboarding" class="onboarding-wrapper hidden"></div>
+
+  <!-- ───────────────────────── MODALS / OVERLAYS ───────────────────────── -->
+  <div id="modal-overlay" class="modal-overlay hidden"></div>
+  <div id="modal-container" class="modal-container hidden"></div>
+  <div id="toast-container" class="toast-container"></div>
+  <div id="checkin-popup" class="checkin-popup hidden"></div>
+
+  <!-- ───────────────────────── SCRIPTS ───────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/algorithm.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/checkin.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
