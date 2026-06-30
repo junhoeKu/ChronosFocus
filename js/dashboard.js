@@ -549,12 +549,8 @@ const DashboardModule = (() => {
 
   /* ── Toggle Task ── */
   function toggleTask(taskId) {
-    const task = DB.Tasks.getAll().find(t => t.id === taskId);
-    if (!task) return;
-    if (task.status === 'done') {
-      DB.Tasks.update(taskId, { status: 'todo', completed_at: null });
-    } else {
-      DB.Tasks.complete(taskId);
+    const task = DB.Tasks.complete(taskId);   // 완료↔미완료 토글은 DB가 담당
+    if (task && task.status === 'done') {
       Toast.show('success', '완료!', `'${task.title.slice(0,20)}' 완료했습니다 🎉`);
     }
     _renderStats();
