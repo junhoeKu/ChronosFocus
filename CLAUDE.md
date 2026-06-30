@@ -3,7 +3,7 @@
 ## 프로젝트 개요
 
 > **생체 리듬(크로노타입) 기반 개인 맞춤형 생산성 관리 웹앱**
-> 하루를 7개 시간대 슬롯으로 나누고, 시간대별 집중도에 맞춰 `고등 작업`/`단순 작업`을 최적의 시간에 배치 추천한다. Vanilla HTML/CSS/JS SPA + LocalStorage 기반. 현재 데모를 **MVP 수준**으로 끌어올리는 단계이며, 상세 범위는 [MVP_구현_계획.md](MVP_구현_계획.md)를 따른다.
+> 하루를 7개 시간대 슬롯으로 나누고, 시간대별 집중도에 맞춰 `고등 작업`/`단순 작업`을 최적의 시간에 배치 추천한다. Vanilla HTML/CSS/JS SPA + LocalStorage 기반. 현재 데모를 **MVP 수준**으로 끌어올리는 단계이며, 상세 범위는 [MVP_구현_계획.md](docs/MVP_구현_계획.md)를 따른다.
 
 ---
 
@@ -112,7 +112,7 @@ ChronosFocus/
     └── app.js               ← 앱 컨트롤러 (스플래시/라우팅/네비게이션)
 ```
 
-> 문서는 `docs/`로 모으는 것을 권장한다 (MVP_구현_계획.md §1.3). 현재는 루트에 위치.
+> 문서는 `docs/`에 모은다 (MVP_구현_계획.md §1.3). `README.md`만 관례에 따라 루트에 둔다.
 
 ---
 
@@ -218,7 +218,7 @@ ALGO.getRecommendation(DB.Tasks.getToday(), DB.Patterns.getAverageScores());
 
 ## 참고 링크
 
-- MVP 구현 계획: [MVP_구현_계획.md](MVP_구현_계획.md)
+- MVP 구현 계획: [docs/MVP_구현_계획.md](docs/MVP_구현_계획.md)
 - 앱 개요: [README.md](README.md)
 - Chart.js 문서: https://www.chartjs.org/docs/latest/
 - MDN Web Storage API: https://developer.mozilla.org/docs/Web/API/Web_Storage_API
