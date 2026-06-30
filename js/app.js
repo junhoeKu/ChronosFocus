@@ -8,6 +8,17 @@ const App = (() => {
   let _initialized = false;
 
   /* ════════════════════════════════════════
+     CONFIG
+     ⚠️ Phase 10(배포 직전): seedDemoTasks 및
+        아래 _addDemoTasks() 함수를 통째로 삭제할 것.
+        실사용자에게 본인이 만들지 않은 데모 작업이
+        보이면 안 됨.
+  ════════════════════════════════════════ */
+  const CONFIG = {
+    seedDemoTasks: false,   // 개발 중 화면 채울 때만 true로 켬 (기본 OFF)
+  };
+
+  /* ════════════════════════════════════════
      INIT
   ════════════════════════════════════════ */
   async function init() {
@@ -109,6 +120,7 @@ const App = (() => {
      ADD DEMO TASKS (if first run)
   ════════════════════════════════════════ */
   function _addDemoTasks() {
+    if (!CONFIG.seedDemoTasks) return;   // 스위치가 꺼져 있으면 데모 작업을 만들지 않음
     const existing = DB.Tasks.getToday();
     if (existing.length > 0) return;
 
