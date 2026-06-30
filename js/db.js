@@ -193,5 +193,11 @@ const DB = (() => {
     }
   }
 
-  return { User, Tasks, Patterns, Feedback, Checkins, _uuid, _today };
+  /* ── 전체 데이터 초기화 (키 관리를 DB 한 곳으로 통일) ── */
+  function clearAll() {
+    [KEY_USER, KEY_TASKS, KEY_PATTERNS, KEY_FEEDBACK, KEY_CHECKINS]
+      .forEach(key => localStorage.removeItem(key));
+  }
+
+  return { User, Tasks, Patterns, Feedback, Checkins, clearAll, _uuid, _today };
 })();

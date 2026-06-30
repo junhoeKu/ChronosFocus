@@ -129,7 +129,7 @@ const ProfileModule = (() => {
 
   function clearData() {
     if (!confirm('모든 데이터를 초기화할까요? 되돌릴 수 없습니다.')) return;
-    ['cf_user','cf_tasks','cf_patterns','cf_feedback','cf_checkins'].forEach(k => localStorage.removeItem(k));
+    DB.clearAll();
     location.reload();
   }
 
