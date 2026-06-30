@@ -48,6 +48,7 @@ const App = (() => {
      SHOW APP
   ════════════════════════════════════════ */
   function showApp() {
+    _addDemoTasks();   // 개발 모드(CONFIG.seedDemoTasks=true)일 때만 데모 작업 생성
     const splash = document.getElementById('splash-screen');
     const app    = document.getElementById('app');
 
@@ -136,16 +137,7 @@ const App = (() => {
     demoTasks.forEach(t => DB.Tasks.add(t));
   }
 
-  // Expose internal for onboarding completion
-  const _origShowApp = showApp;
-  return {
-    init,
-    showApp: () => {
-      _addDemoTasks();
-      _origShowApp();
-    },
-    navigate,
-  };
+  return { init, showApp, navigate };
 })();
 
 /* ════════════════════════════════════════
