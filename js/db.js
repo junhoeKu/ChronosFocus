@@ -11,8 +11,27 @@ const DB = (() => {
   const KEY_CHECKINS= 'cf_checkins';
 
   /* ── Helpers ── */
-  function _get(key)       { try { return JSON.parse(localStorage.getItem(key)) || null; } catch { return null; } }
-  function _set(key, val)  { localStorage.setItem(key, JSON.stringify(val)); }
+  function _get(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === null) return fallback;          // 키 자체가 없으면 기본값
+      return JSON.parse(raw);
+    } catch (error) {
+      console.warn(`[DB] 파싱 실패: ${key}`, error);
+      return fallback;                            // 깨진 데이터여도 앱이 멈추지 않게
+    }
+  }
+  function _set(key, val) {
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+      return true;
+    } catch (error) {
+      // 저장소 용량 초과·사생활 보호 모드 등 → 앱을 멈추지 않고 사용자에게 알림
+      console.error(`[DB] 저장 실패: ${key}`, error);
+      Toast?.show?.('error', '저장 실패', '브라우저 저장소 용량 또는 권한을 확인해주세요.');
+      return false;
+    }
+  }
   function _uuid()         { return 'cf-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
   function _now()          { return new Date().toISOString(); }
   function _today()        { return new Date().toISOString().slice(0,10); }
@@ -60,6 +79,7 @@ const DB = (() => {
         status: 'todo',
         scheduled_date: _today(),
         created_at: _now(),
+        updated_at: _now(),   // 생성 시에도 채워 update와 스키마 일관성 유지
         ...data
       };
       tasks.unshift(task);
@@ -76,8 +96,16 @@ const DB = (() => {
       return tasks[idx];
     },
 
+    // 완료 ↔ 미완료 토글. 완료 시 실제 완료 시간대(actual_slot)를 기록한다.
     complete(id) {
-      return this.update(id, { status: 'done', completed_at: _now() });
+      const task = this.getAll().find(t => t.id === id);
+      if (!task) return null;
+      const done = task.status === 'done';
+      return this.update(id, {
+        status:       done ? 'todo' : 'done',
+        completed_at: done ? null   : _now(),
+        actual_slot:  done ? null   : ALGO.getCurrentSlot(),
+      });
     },
 
     remove(id) {
