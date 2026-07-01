@@ -96,6 +96,12 @@ const ALGO = (() => {
     },
   };
 
+  /** 슬롯별 가상 작업 용량(분). 이 시간을 넘기면 다음 슬롯으로 넘긴다. */
+  const SLOT_CAPACITY_MINUTES = {
+    dawn: 120, morning: 180, forenoon: 180, lunch: 60,
+    afternoon: 240, evening: 180, night: 180,
+  };
+
   /** Focus score → level mapping */
   const FOCUS_LEVELS = [
     { min: 4.5, level: 'peak',   label: '최고조',   short: '상', color: '#38bdf8', recommend: 'high' },
@@ -186,24 +192,28 @@ const ALGO = (() => {
     const slotInfo     = getSlotInfo(currentSlot);
 
     // 남은 할 일 분류
-    const remaining  = tasks.filter(t => t.status !== 'done');
-    const highTasks  = remaining.filter(t => t.category === 'high');
-    const lowTasks   = remaining.filter(t => t.category === 'low');
+    const remaining    = tasks.filter(t => t.status !== 'done');
+    const highTasks    = remaining.filter(t => t.category === 'high');
+    const lowTasks     = remaining.filter(t => t.category === 'low');
+    const urgentTasks  = remaining.filter(t => t.priority === 'urgent');
 
     // 현재 시간에 최적 작업 타입 결정
     let recommendedCategory = focusInfo.recommend;
     let prioritizedTasks    = [];
 
     if (recommendedCategory === 'high') {
-      // 고등 작업이 없으면 단순 작업 추천
-      prioritizedTasks = highTasks.length > 0 ? highTasks : lowTasks;
+      // 고등 작업 → 없으면 긴급 → 그래도 없으면 단순
+      prioritizedTasks = highTasks.length > 0 ? highTasks
+                       : urgentTasks.length > 0 ? urgentTasks : lowTasks;
     } else if (recommendedCategory === 'low') {
-      prioritizedTasks = lowTasks.length > 0 ? lowTasks : highTasks;
+      // 단순 작업 → 없으면 긴급 → 그래도 없으면 고등
+      prioritizedTasks = lowTasks.length > 0 ? lowTasks
+                       : urgentTasks.length > 0 ? urgentTasks : highTasks;
     } else if (recommendedCategory === 'any') {
-      // 긴급 우선, 그다음 고등, 그다음 단순
-      const urgent = remaining.filter(t => t.priority === 'urgent');
-      prioritizedTasks = urgent.length > 0 ? urgent : remaining;
+      // 긴급 우선, 없으면 남은 전체
+      prioritizedTasks = urgentTasks.length > 0 ? urgentTasks : remaining;
     } else {
+      // rest: 빈 화면 방지를 위해 남은 전체를 부드럽게 노출
       prioritizedTasks = remaining;
     }
 
@@ -243,33 +253,38 @@ const ALGO = (() => {
    * @returns {Array} tasks with recommended_slot assigned
    */
   function smartSchedule(tasks, scores) {
-    // 슬롯을 집중도 순으로 정렬
-    const sortedSlots = SLOTS.map(s => ({
-      ...s,
+    // 슬롯마다 집중도 점수 + 용량 + 이미 배치된 시간(assigned)을 들고 다닌다.
+    const slots = SLOTS.map(s => ({
+      id: s.id,
       score: scores[s.id] || 2,
-      assignedMinutes: 0,  // 이미 배치된 시간
-    })).sort((a, b) => b.score - a.score);
+      capacity: SLOT_CAPACITY_MINUTES[s.id] || 120,
+      assigned: 0,
+    }));
 
-    const highTasks = tasks.filter(t => t.category === 'high').sort((a,b) => _priorityWeight(b) - _priorityWeight(a));
-    const lowTasks  = tasks.filter(t => t.category === 'low').sort((a,b) => _priorityWeight(b) - _priorityWeight(a));
+    // 우선순위가 높은 작업부터 좋은 슬롯을 먼저 차지하도록 정렬
+    const sortedTasks = [...tasks].sort((a, b) => _priorityWeight(b) - _priorityWeight(a));
 
-    // 고등 작업 → 집중도 높은 슬롯에 배치
-    const highSlots = sortedSlots.filter(s => s.score >= 3.5);
-    const lowSlots  = sortedSlots.filter(s => s.score < 3.5);
+    return sortedTasks.map(task => {
+      const candidates = _getCandidateSlots(task, slots);
+      const estimated  = task.estimated_min || 30;   // 예상시간 없으면 기본 30분
 
-    const scheduled = [];
+      // 용량이 남는 첫 후보를 고르고, 다 차 있으면 최선(첫 후보)에 배치
+      const selected = candidates.find(slot => slot.assigned + estimated <= slot.capacity) || candidates[0];
+      if (selected) selected.assigned += estimated;
 
-    highTasks.forEach((task, i) => {
-      const slot = highSlots[i % Math.max(highSlots.length, 1)];
-      scheduled.push({ ...task, recommended_slot: slot ? slot.id : 'forenoon' });
+      return { ...task, recommended_slot: selected ? selected.id : 'forenoon' };
     });
+  }
 
-    lowTasks.forEach((task, i) => {
-      const slot = (lowSlots.length > 0 ? lowSlots : sortedSlots.slice(-3))[i % Math.max(lowSlots.length, 1)];
-      scheduled.push({ ...task, recommended_slot: slot ? slot.id : 'afternoon' });
-    });
-
-    return scheduled;
+  /**
+   * 작업 카테고리에 맞는 후보 슬롯을 선호 순서대로 정렬해 반환.
+   * 고등 작업 → 집중도 높은 슬롯 우선, 단순 작업 → 집중도 낮은 슬롯 우선.
+   */
+  function _getCandidateSlots(task, slots) {
+    if (task.category === 'high') {
+      return [...slots].sort((a, b) => b.score - a.score);
+    }
+    return [...slots].sort((a, b) => a.score - b.score);
   }
 
   /**
@@ -368,3 +383,8 @@ const ALGO = (() => {
   };
 
 })();
+
+/* Node 환경(테스트)에서만 내보낸다 — 브라우저에는 영향 없음 */
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ALGO;
+}
