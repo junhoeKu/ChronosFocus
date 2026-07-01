@@ -83,7 +83,8 @@ const OnboardingModule = (() => {
   ];
 
   let _answers  = {};
-  let _currentQ = -1;  // -1 = welcome
+  let _currentQ = -1;    // -1 = welcome
+  let _analysis = null;  // 분석 결과 (showResult → complete 간 공유)
 
   function init() {
     const wrapper = document.getElementById('onboarding');
@@ -171,6 +172,11 @@ const OnboardingModule = (() => {
 
     const scoreColors = ['#94a3b8','#fbbf24','#34d399','#38bdf8','#7c6af5'];
 
+    // 피크 / 낮은 집중 시간대 라벨
+    const slotText = ids => (ids || []).map(id => { const s = ALGO.getSlotInfo(id); return `${s.emoji} ${s.label}`; }).join(', ');
+    const peakText = slotText(type.peak_slots);
+    const lowText  = slotText(type.low_slots);
+
     return `
       <div class="ob-progress-bar">
         <div class="ob-progress-track"><div class="ob-progress-fill" style="width:100%"></div></div>
@@ -183,6 +189,10 @@ const OnboardingModule = (() => {
           <div class="result-type-name">${type.name}</div>
           <div class="result-type-sub">${type.title}</div>
           <p style="font-size:13px;color:#9d93c8;text-align:center;line-height:1.6;margin:12px 0;">${type.desc}</p>
+          <div style="display:flex;flex-direction:column;gap:6px;margin:6px 0 14px;">
+            <div style="font-size:13px;color:#cbd5e1;">🔥 <strong>피크 시간대</strong> · ${peakText}</div>
+            <div style="font-size:13px;color:#cbd5e1;">😴 <strong>낮은 집중 시간대</strong> · ${lowText}</div>
+          </div>
           <div class="result-scores">
             ${SLOTS.map(s => {
               const score = scores[s.id] || 2;
@@ -202,15 +212,6 @@ const OnboardingModule = (() => {
             ${type.traits.map(t => `<span class="result-trait">#${t}</span>`).join('')}
           </div>
           <div class="result-watermark">⏱ ChronosFocus</div>
-        </div>
-
-        <div class="ob-share-btns">
-          <button class="ob-share-btn twitter" onclick="OnboardingModule.shareTwitter()">
-            <i class="fa-brands fa-x-twitter"></i> X(트위터)에 공유
-          </button>
-          <button class="ob-share-btn copy" onclick="OnboardingModule.copyShareText()">
-            <i class="fa-solid fa-copy"></i> 링크 복사
-          </button>
         </div>
 
         <button class="btn btn-primary btn-lg btn-full" onclick="OnboardingModule.complete()">
@@ -255,7 +256,7 @@ const OnboardingModule = (() => {
     wrapper.innerHTML = _renderResult(analysis);
 
     // Store for later
-    window._obAnalysis = analysis;
+    _analysis = analysis;
 
     // Trigger bar fill animation after render
     setTimeout(() => {
@@ -268,7 +269,7 @@ const OnboardingModule = (() => {
   }
 
   function complete() {
-    const analysis = window._obAnalysis;
+    const analysis = _analysis;
     if (!analysis) return;
 
     // Save user data
@@ -277,6 +278,8 @@ const OnboardingModule = (() => {
       focus_type: analysis.typeId,
       focus_type_name: analysis.type.name,
       focus_scores: JSON.stringify(analysis.focusScores),
+      wake_time: analysis.wakeTime,   // 나중에 수면↔집중도 분석용
+      sleep_time: analysis.sleepTime,
     });
 
     // Save initial focus patterns
@@ -298,23 +301,5 @@ const OnboardingModule = (() => {
     }, 500);
   }
 
-  function shareTwitter() {
-    const analysis = window._obAnalysis;
-    if (!analysis) return;
-    const text = `나의 집중 유형은 「${analysis.type.emoji} ${analysis.type.name}」!\n${analysis.type.title}\n\n#ChronosFocus #생산성 #집중력테스트`;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-  }
-
-  function copyShareText() {
-    const analysis = window._obAnalysis;
-    if (!analysis) return;
-    const text = `나의 집중 유형은 「${analysis.type.emoji} ${analysis.type.name}」! ${analysis.type.title}\n\nChronosFocus 집중 유형 테스트: ${location.href}`;
-    navigator.clipboard.writeText(text).then(() => {
-      Toast.show('success', '복사 완료!', '공유 텍스트가 클립보드에 복사됐습니다.');
-    }).catch(() => {
-      Toast.show('info', '복사 실패', '직접 복사해주세요: ' + text.slice(0, 60) + '...');
-    });
-  }
-
-  return { init, goToQuestion, selectOption, next, showResult, complete, shareTwitter, copyShareText };
+  return { init, goToQuestion, selectOption, next, showResult, complete };
 })();

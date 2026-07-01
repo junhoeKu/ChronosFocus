@@ -287,10 +287,14 @@ const ALGO = (() => {
     return [...slots].sort((a, b) => a.score - b.score);
   }
 
+  /** Q1(기상)·Q6(취침) 답변 → 대표 시각(시) 매핑 */
+  const WAKE_HOURS  = { a: 6,  b: 8,  c: 10, d: 12 };
+  const SLEEP_HOURS = { a: 22, b: 23, c: 1,  d: 3  };
+
   /**
    * 온보딩 답변 → 집중 유형 판별
    * @param {Object} answers - { q1: 'a', q2: 'b', ... }
-   * @returns {{ typeId, type, scores }}
+   * @returns {{ typeId, type, allScores, focusScores, wakeTime, sleepTime }}
    */
   function analyzeOnboarding(answers) {
     const scores = { owl: 0, eagle: 0, lion: 0, bear: 0, dolphin: 0 };
@@ -327,6 +331,8 @@ const ALGO = (() => {
       type: typeData,
       allScores: scores,
       focusScores: _blendScores(typeData.scores, answers),
+      wakeTime:  WAKE_HOURS[answers.q1]  ?? 7,   // 답 없거나 알 수 없으면 기본 7시
+      sleepTime: SLEEP_HOURS[answers.q6] ?? 23,  // 기본 23시
     };
   }
 

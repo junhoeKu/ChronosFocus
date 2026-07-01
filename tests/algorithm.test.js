@@ -130,6 +130,22 @@ test('getCurrentSlot은 정의된 슬롯 중 하나를 반환한다', () => {
   assert.ok(ids.includes(ALGO.getCurrentSlot()));
 });
 
+/* ── analyzeOnboarding: 기상/취침 답변 → 시각 파생 (Phase 4) ── */
+test('analyzeOnboarding이 Q1/Q6 답변을 대표 시각으로 변환한다', () => {
+  const r = ALGO.analyzeOnboarding({ q1:'a', q6:'d' });
+  assert.strictEqual(r.wakeTime, 6);
+  assert.strictEqual(r.sleepTime, 3);
+  const r2 = ALGO.analyzeOnboarding({ q1:'c', q6:'b' });
+  assert.strictEqual(r2.wakeTime, 10);
+  assert.strictEqual(r2.sleepTime, 23);
+});
+
+test('analyzeOnboarding은 답변 누락 시 기본값(기상7·취침23)을 쓴다', () => {
+  const r = ALGO.analyzeOnboarding({});
+  assert.strictEqual(r.wakeTime, 7);
+  assert.strictEqual(r.sleepTime, 23);
+});
+
 /* ── 요약 ── */
 console.log(`\n${'─'.repeat(40)}\n결과: ${passed} 통과, ${failed} 실패`);
 process.exit(failed ? 1 : 0);
